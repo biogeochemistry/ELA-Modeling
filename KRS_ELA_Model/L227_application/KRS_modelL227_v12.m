@@ -16,7 +16,7 @@ disp('A')
 %the model running error-free.
 
 % load /Users/krsalkgu/Documents/MATLAB/MyLake_public-master/v12/Vansjo_application/Observations/vansjoice.dat
-% load /Users/krsalkgu/Documents/MATLAB/MyLake_public-master/v12/Vansjo_application/Observations/vansjotemp.dat
+load /Users/krsalkgu/Documents/MATLAB/KRS_ELA_Model/L227_application/Observations/L227temp.txt
 % 
 % [Obs_TP_Chla, trash]=xlsread('/Users/krsalkgu/Documents/MATLAB/MyLake_public-master/v12/Vansjo_application/Observations/Vansjo_TP_Chla84_05.xls');
 % % year, month, day, TP, Chla
@@ -61,24 +61,24 @@ tt_mod = tt - datenum(year,1,1); %time now scaled so that it begins from the 1 j
 % inx=find((IceObs(:,1)<(datenum(m_start)- datenum(year,1,1)))|(IceObs(:,1)>(datenum(m_stop)- datenum(year,1,1))));
 % IceObs(inx,:)=[];
 % 
-% %=Temperature profile observations (tt_mod, z, T)
-% Datestr=num2str(vansjotemp(:,1));
-% Dummydate=[str2num(Datestr(:,1:4)),str2num(Datestr(:,5:6)),str2num(Datestr(:,7:8))];
-% TempObs=[datenum(Dummydate) - datenum(year,1,1), -vansjotemp(:,3)./100, vansjotemp(:,4)];
-% 
-% %=align temperature observations with model results
-% alku=[1;find(diff(TempObs(:,1))~=0)+1];
-% loppu=[find(diff(TempObs(:,1))~=0); length(TempObs)];
-% 
-% for i=1:length(alku)
-% inxt=find(tt_mod==TempObs(alku(i),1));
-%     if (isempty(inxt)==0)
-%     TempMod(alku(i):loppu(i))=interp1(zz,Tzt(:,inxt),TempObs(alku(i):loppu(i),2));
-%     else
-%     TempMod(alku(i):loppu(i))=NaN;    
-%     end    
-% end
+%=Temperature profile observations (tt_mod, z, T)
+Datestr=num2str(L227temp(:,1));
+Dummydate=[str2num(Datestr(:,1:4)),str2num(Datestr(:,5:6)),str2num(Datestr(:,7:8))];
+TempObs=[datenum(Dummydate) - datenum(year,1,1), L227temp(:,3), L227temp(:,4)];
 
+%=align temperature observations with model results
+alku=[1;find(diff(TempObs(:,1))~=0)+1];
+loppu=[find(diff(TempObs(:,1))~=0); length(TempObs)];
+
+for i=1:length(alku)
+inxt=find(tt_mod==TempObs(alku(i),1));
+    if (isempty(inxt)==0)
+    TempMod(alku(i):loppu(i))=interp1(zz,Tzt(:,inxt),TempObs(alku(i):loppu(i),2));
+    else
+    TempMod(alku(i):loppu(i))=NaN;    
+    end    
+end
+disp('F')
 zlim = [0 max(zz)];
 tlim = [min(tt_mod) max(tt_mod)];
 
@@ -124,72 +124,72 @@ ylabel('Hice, Hsnow (m)');
 grid on;
 
 
-% figure(2)
-% clf
-% plot([0 25],[0 25],':b', TempObs(:,3), TempMod, '.r');
-% set(gca,'fontsize',9);
-% ylabel('Modelled temperature (^oC)');
-% xlabel('Measured temperature (^oC)');
-% axis([0 25 0 25]);
-% axis square;
-% title([lake ' ' datestr(datenum(m_start),28) '--' datestr(datenum(m_stop),28)]); 
-% grid on;
+figure(2)
+clf
+plot([0 25],[0 25],':b', TempObs(:,3), TempMod, '.r');
+set(gca,'fontsize',9);
+ylabel('Modelled temperature (^oC)');
+xlabel('Measured temperature (^oC)');
+axis([0 25 0 25]);
+axis square;
+title([lake ' ' datestr(datenum(m_start),28) '--' datestr(datenum(m_stop),28)]); 
+grid on;
+disp('G')
+figure(3)
+clf
+fign=6;
+inxpos=find(isnan(TempMod(alku))==0);
+posalku=alku(inxpos);
+posloppu=loppu(inxpos);
 
-% figure(3)
-% clf
-% fign=6;
-% inxpos=find(isnan(TempMod(alku))==0);
-% posalku=alku(inxpos);
-% posloppu=loppu(inxpos);
-% 
-% for i = 1:min(fign,length(posalku))
-%    subplot(3,3,i);
-%    inxt=find(tt_mod==TempObs(posalku(i),1));
-%    plot(Tzt(:,inxt),zz,'-b',TempObs(posalku(i):posloppu(i),3),TempObs(posalku(i):posloppu(i),2),'.r');
-%    axis([0 25 zlim])
-%    axis ij
-%    title(['Vansjø-Stfj. ' datestr(tt_mod(inxt)+datenum(year,1,1)),],'fontsize',8); 
-%    set(gca,'FontSize',8) 
-% end;
-% 
-%    subplot(334)
-%    ylabel('Depth (m)','fontsize',8)
-%    xlabel('Temperature (^{o}C)','fontsize',8)
-%    
-%    subplot(331)
-%    ylabel('Depth (m)','fontsize',8)
-%     
-%     subplot(335)
-%    xlabel('Temperature (^{o}C)','fontsize',8)
-%    
-%      subplot(336)
-%    xlabel('Temperature (^{o}C)','fontsize',8)
+for i = 1:min(fign,length(posalku))
+   subplot(3,3,i);
+   inxt=find(tt_mod==TempObs(posalku(i),1));
+   plot(Tzt(:,inxt),zz,'-b',TempObs(posalku(i):posloppu(i),3),TempObs(posalku(i):posloppu(i),2),'.r');
+   axis([0 25 zlim])
+   axis ij
+   title(['L227 ' datestr(tt_mod(inxt)+datenum(year,1,1)),],'fontsize',8); 
+   set(gca,'FontSize',8) 
+end;
 
-% figure(4)
-% clf
-% for i = fign+1:min(12,length(posalku))
-%    subplot(3,3,i-fign);
-%    set(gca,'FontSize',8) 
-%    inxt=find(tt_mod==TempObs(posalku(i),1));
-%    plot(Tzt(:,inxt),zz,'-b',TempObs(posalku(i):posloppu(i),3),TempObs(posalku(i):posloppu(i),2),'.r');
-%    axis([0 25 zlim])
-%    axis ij
-%    title(['Vansjø-Stfj. ' datestr(tt_mod(inxt)+datenum(year,1,1)),],'fontsize',8); 
-% end;
-% 
-%    subplot(334)
-%    ylabel('Depth (m)','fontsize',8)
-%    xlabel('Temperature (^{o}C)','fontsize',8)
-%    
-%     subplot(331)
-%    ylabel('Depth (m)','fontsize',8)
-%    
-%     subplot(335)
-%    xlabel('Temperature (^{o}C)','fontsize',8)
-%    
-%      subplot(336)
-%    xlabel('Temperature (^{o}C)','fontsize',8)
+   subplot(334)
+   ylabel('Depth (m)','fontsize',8)
+   xlabel('Temperature (^{o}C)','fontsize',8)
+   
+   subplot(331)
+   ylabel('Depth (m)','fontsize',8)
+    
+    subplot(335)
+   xlabel('Temperature (^{o}C)','fontsize',8)
+   
+     subplot(336)
+   xlabel('Temperature (^{o}C)','fontsize',8)
+disp('H')
+figure(4)
+clf
+for i = fign+1:min(12,length(posalku))
+   subplot(3,3,i-fign);
+   set(gca,'FontSize',8) 
+   inxt=find(tt_mod==TempObs(posalku(i),1));
+   plot(Tzt(:,inxt),zz,'-b',TempObs(posalku(i):posloppu(i),3),TempObs(posalku(i):posloppu(i),2),'.r');
+   axis([0 25 zlim])
+   axis ij
+   title(['L227 ' datestr(tt_mod(inxt)+datenum(year,1,1)),],'fontsize',8); 
+end;
 
+   subplot(334)
+   ylabel('Depth (m)','fontsize',8)
+   xlabel('Temperature (^{o}C)','fontsize',8)
+   
+    subplot(331)
+   ylabel('Depth (m)','fontsize',8)
+   
+    subplot(335)
+   xlabel('Temperature (^{o}C)','fontsize',8)
+   
+     subplot(336)
+   xlabel('Temperature (^{o}C)','fontsize',8)
+disp('I')
 
 figure(5)
 clf
@@ -758,7 +758,7 @@ subplot(211)
  
  
  %=Figures for modelpaper
- tlims=[datenum([1984,12,15]) datenum([2001,1,15])];
+ tlims=[datenum([1969,06,27]) datenum([2011,12,31])];
  
  figure(20)
  clf
@@ -833,49 +833,56 @@ subplot(211)
  set(gca,'xlim',tlims)
 
  
-% figure(22)
-% clf
-% subplot(311)
-% % inx=find(round(TempObs(:,2))<2);
-% % H=plot(TempObs(inx,1)+datenum(year,1,1),TempObs(inx,3),'r+','linewidth',2);
-% hold on
-% plot(tt_mod+datenum(year,1,1),Tzt(1,:),'-');
-%  set(gca,'ylim',[0 25]);
-%  ylabel('^oC','fontsize',9)
-%  title('Temperature  0-1m','fontweight','bold')
-%  datetick('x','yy')
-%  grid on
-%  set(gca,'fontsize',9)
-%  set(gca,'xticklabel',[]);
-% set(gca,'xlim',tlims)
-%  
-% subplot(312)
-% % inx=find((round(TempObs(:,2))==10)|(round(TempObs(:,2))==11));
-% % plot(TempObs(inx,1)+datenum(year,1,1),TempObs(inx,3),'r+','linewidth',2);
-% hold on
-% plot(tt_mod+datenum(year,1,1),Tzt(11,:),'-');
-%  set(gca,'ylim',[0 25]);
-%  ylabel('^oC','fontsize',9)
-%  title('Temperature  10-11m','fontweight','bold')
-%  datetick('x','yy')
-%  grid on
-%  set(gca,'fontsize',9)
-%  set(gca,'xticklabel',[]);
-%  set(gca,'xlim',tlims)
-%  
-%  subplot(313)
-% % inx=find((round(TempObs(:,2))==30)|(round(TempObs(:,2))==31));
-% % plot(TempObs(inx,1)+datenum(year,1,1),TempObs(inx,3),'r+','linewidth',2);
-% hold on
-% plot(tt_mod+datenum(year,1,1),Tzt(31,:),'-');
-%  set(gca,'ylim',[0 25]);
-%  ylabel('^oC','fontsize',9)
-%  xlabel('year','fontsize',9)
-%  title('Temperature 30-31m','fontweight','bold')
-%  datetick('x','yy')
-%  grid on
-%  set(gca,'fontsize',9)
-%  set(gca,'xlim',tlims)
+figure(22)
+clf
+subplot(311)
+inx=find(round(TempObs(:,2))<2);
+H=plot(TempObs(inx,1)+datenum(year,1,1),TempObs(inx,3),'r+','linewidth',2);
+hold on
+plot(tt_mod+datenum(year,1,1),Tzt(1,:),'-');
+ set(gca,'ylim',[0 25]);
+ ylabel('^oC','fontsize',9)
+ title('Temperature  0-1 m','fontweight','bold')
+ datetick('x','yy')
+ grid on
+ set(gca,'fontsize',9)
+ set(gca,'xticklabel',[]);
+set(gca,'xlim',tlims)
+ 
+%set up for metalimnion, 4-5 m depth (changed 7-21-17)
+subplot(312)
+%set depth for observed temperatures to 4-5 m
+inx=find((round(TempObs(:,2))==4)|(round(TempObs(:,2))==5));
+plot(TempObs(inx,1)+datenum(year,1,1),TempObs(inx,3),'r+','linewidth',2);
+hold on
+%set depth for modeled temperatures to 5 m
+plot(tt_mod+datenum(year,1,1),Tzt(5,:),'-');
+ set(gca,'ylim',[0 25]);
+ ylabel('^oC','fontsize',9)
+ title('Temperature  4-5 m','fontweight','bold')
+ datetick('x','yy')
+ grid on
+ set(gca,'fontsize',9)
+ set(gca,'xticklabel',[]);
+ set(gca,'xlim',tlims)
+ 
+ %set up for hypolimnion, 8-9 m depth (changed 7-21-17)
+ subplot(313)
+ %set depth for observed temperatures to 8-9 m
+inx=find((round(TempObs(:,2))==8)|(round(TempObs(:,2))==9));
+plot(TempObs(inx,1)+datenum(year,1,1),TempObs(inx,3),'r+','linewidth',2);
+hold on
+%set depth for modeled temperatures to 9 m
+plot(tt_mod+datenum(year,1,1),Tzt(9,:),'-');
+ set(gca,'ylim',[0 25]);
+ ylabel('^oC','fontsize',9)
+ xlabel('year','fontsize',9)
+ title('Temperature 8-9 m','fontweight','bold')
+ datetick('x','yy')
+ grid on
+ set(gca,'fontsize',9)
+ set(gca,'xlim',tlims)
+ disp('J')
  %===============
  
  disp(['Sum of P sinks: '  num2str(round(sum(MixStat(14,:)+MixStat(15,:)))) ' kg']); 
