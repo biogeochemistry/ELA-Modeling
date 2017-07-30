@@ -75,8 +75,8 @@ yd = t + [0:resol_t-1]'/resol_t - datenum(yr,1,1); %decimal yearday (every n min
  
 if(isnan(GR))   % if Global radiation input is missing calculate total transmissivity from formulaes 
     
-      %Trnsmiss=0.95*sin(alt*pi/180)*CloudCorr; % by Iqbal (1993??) and Reed (1977) (Varies over day, and zeros at night)
-      Trnsmiss=(0.377 + 0.00513*max(alt))*CloudCorr*ones(size(alt)); 
+      Trnsmiss=0.95*sin(alt*pi/180)*CloudCorr; % by Iqbal (1993??) and Reed (1977) (Varies over day, and zeros at night)
+%       Trnsmiss=(0.377 + 0.00513*max(alt))*CloudCorr*ones(size(alt)); 
       % empirically determined from Breisjo & Vansjo data
 
 else %if Global radiation input is given calculate total transmissivity based on the observations  
@@ -97,8 +97,10 @@ else
 end 
 
 
-Qma = (1 - alb) .* rad .* Trnsmiss;
-ind = find(isnan(Qma));
+Qma = (1 - alb) .* rad .* Trnsmiss;
+
+ind = find(isnan(Qma));
+
 Qma(ind) = zeros(size(ind));
 
 Qsw = mean(Qma);
